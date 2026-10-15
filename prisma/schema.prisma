@@ -1,0 +1,120 @@
+// ES HSE - Egyptian Steel HSE Application Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  esId          Int      @unique
+  name          String
+  employeeId    String   @unique
+  phone         String   @unique
+  departmentId  String?
+  department    String
+  position      String
+  shiftId       String?
+  shift         String
+  role          String   @default("worker")
+  status        String   @default("active")
+  passwordHash  String
+  profileImage  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  currentPoints      Int       @default(0)
+  seasonPoints       Int       @default(0)
+  lifetimeXP         Int       @default(0)
+  userLevel          Int       @default(1)
+  equippedFrameId    String?
+  lastLoginDate      DateTime?
+  loginStreak        Int       @default(0)
+  monthPoints        Int       @default(0)
+  lastActiveAt       DateTime?
+  factoryStatusText  String?
+  factoryStatusLevel String?
+  safeDaysCount      Int       @default(0)
+  recordDaysCount    Int       @default(0)
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  locations Location[]
+}
+
+model Location {
+  id           String   @id @default(cuid())
+  name         String
+  departmentId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  @@index([departmentId])
+}
+
+model Report {
+  id               String   @id @default(cuid())
+  reportNumber     String   @unique
+  title            String
+  type             String
+  department       String
+  location         String
+  landmark         String?
+  description      String
+  severity         String
+  immediateAction  String?
+  status           String   @default("new")
+  rejectionReason  String?
+  createdById      String
+  assignedToId     String?
+  dueDate          DateTime?
+  closedAt         DateTime?
+  closedById       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  @@index([status])
+  @@index([department])
+  @@index([severity])
+  @@index([type])
+}
+
+model ShopItem {
+  id                  String   @id @default(cuid())
+  itemId              String   @unique
+  title               String
+  description         String?
+  category            String
+  pricePoints         Int
+  requiredLevel       Int      @default(1)
+  isAnimated          Boolean  @default(false)
+  isLegendary         Boolean  @default(false)
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  @@index([category])
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+  @@index([key])
+}
+
+model Shift {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  startTime String
+  endTime   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
